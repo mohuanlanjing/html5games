@@ -9,21 +9,25 @@
             margin-left: auto;
             margin-right: auto;
         }
+        div {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 <body>
     <script>
         var game = new Phaser.Game(600, 450, Phaser.AUTO, '', { preload: preload, create: create, update: update });
-        var basecount = 10;
+        var init_count = 7
+        var basecount = init_count;
         var before_time = 0;
+        var start_time = get_now();
         var score = 0;
         var scoreText;
-        var move_speed = 150
+        var move_speed = 175;
         function preload() {
             game.load.image('plane', 'pic/plane.jpg');
             game.load.image('star', 'pic/star.png');
-            //game.load.spritesheet('ghost', 'pic/baddie.png', 32, 32);
         }
 
         function create() {
@@ -41,16 +45,16 @@
 
         function update() {
             game.physics.arcade.collide(player, stars, GameOver);
-            //game.physics.arcade.overlap(player, stars, GameOver, null, this);
             player.body.velocity.x = 0;
             player.body.velocity.y = 0;
-            if (game.time.now - before_time > 3000) {
-                before_time = game.time.now;
+            if (get_now() - before_time > 3000) {
+                before_time = get_now();
                 basecount = parseInt(basecount * 1.2);
                 create_randomstar(stars, basecount);
             }
 
             cursors = game.input.keyboard.createCursorKeys();
+
             if (cursors.left.isDown){
                 player.body.velocity.x = -move_speed;
             }
@@ -63,12 +67,16 @@
             if (cursors.down.isDown){
                 player.body.velocity.y = move_speed;
             }
-            scoreText.text = '生存时间: ' + game.time.now/1000 + "s";
+            scoreText.text = '生存时间: ' + (get_now() - start_time)/1000 + "s";
 
         }
 
         function GameOver(player) {
             game.paused = true;
+        }
+
+        function get_now() {
+            return new Date().getTime();
         }
 
         function getspeed(base) {
@@ -94,5 +102,21 @@
                 star.body.gravity.x = getspeed(150);
             }
         }
+        window.onkeydown = function(event) {
+            console.log(event.keyCode);
+            if (event.keyCode == 32){
+                //game.paused = !game.paused;
+                if (game.paused){
+                    game.paused = false;
+                    game.state.restart();
+                    stars.removeAll();
+                    basecount = init_count;
+                    start_time = get_now();
+                    before_time = 0;
+                }
+            }
+        }
+
     </script>
+    <div><strong>失败后空格键重置游戏</strong></div>
 </body>
