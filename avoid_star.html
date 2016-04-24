@@ -33,6 +33,7 @@
         function create() {
             game.physics.startSystem(Phaser.Physics.ARCADE);
             player = game.add.sprite(290, game.world.height-220, 'plane');
+            player.scale.setTo(0.8, 0.8);
             game.physics.arcade.enable(player);
             player.body.collideWorldBounds = true;
 
